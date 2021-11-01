@@ -1,11 +1,21 @@
-const express = require('express');
-const userRouter = require('./router.js');
+const Koa = require('koa');
+const Router = require('koa-router');
+const bodyParser =require('koa-bodyparser');
 
-const app = express();
-const port = process.env.PORT || 4000;
+const port = 4041;
 
-app.use(userRouter); //route 적용하기
+const app = new Koa();
+const router = new Router();
 
-app.listen(port, () => {
-    console.log('####Express listening on port####', port);
+const api = require('./api');
+router.use('/api', api.routes()); 
+
+
+app.use(bodyParser());
+app.use(router.routes()).use(router.allowedMethods());
+
+
+
+app.listen(port, function () {
+    console.log('Example app listening on port : ' + port);
 });
