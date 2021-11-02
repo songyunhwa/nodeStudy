@@ -17,10 +17,12 @@
   },
   "homepage": "https://github.com/songyunhwa/nodeApp#readme",
   "dependencies": {
+    "async": "^3.2.2",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-mysql": "^1.0.3",
     "koa-router": "^10.1.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "pbkdf2-password": "^1.2.1"
   }
 }
