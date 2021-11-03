@@ -10,7 +10,7 @@ const pbkdf2Password = require("pbkdf2-password");
 const hasher = pbkdf2Password();
 const  salt = '###DFDSFSDFSEE4rwersdfsdfR';
 
-exports.signUp = async ctx => {
+exports.signUp = ctx => {
     const { name, email, password } = ctx.request.body;
 
     hasher({password : password, salt:salt} ,(err,pass,salt,hash)=>{
@@ -18,54 +18,68 @@ exports.signUp = async ctx => {
         console.log(err);
     }
       
-    connection.query("SELECT * FROM user WHERE email='" + email + "'" ,
-    function (error, results, fields) {
-    if (error){ 
+    selectUser(email)
+    .then((data)=>{
+        if(data.length === 0){
+            insertUser(name,email,hash,salt);
+        }else {
+            console.log('User already exists');
+        }
+    })
+    .catch((error)=>{
         console.log("error ocurred", error);
-    }
-
-    if(results.length === 0){
-        connection.query('INSERT INTO user (name, email, password, salt) VALUES(?,?,?,? ) ' , [name, email, hash, salt], function (error, results, fields) {
-            if (error) {
-                console.log("error ocurred", error);
-            }
-
-            console.log(results);
-        }); 
-    }else {
-        console.log('User already exists');
-    }
-})
+    })
 })
 }
 
-exports.login = async ctx => {
+selectUser = (email) => {
+    return new Promise( (resolve, reject)=> {
+    connection.query("SELECT * FROM user WHERE email='" + email + "'" ,
+    function (error, results, fields) {
+    if (error){ 
+        reject(error);
+    }
+    resolve(results[0]);
+    });
+    });
+}
+
+insertUser = (name,email,hash,salt) => {
+    connection.query('INSERT INTO user (name, email, password, salt) VALUES(?,?,?,? ) ' , [name, email, hash, salt], function (error, results, fields) {
+        if (error) {
+            console.log("error ocurred", error);
+        }
+
+        console.log(results);
+    }); 
+}
+
+exports.login = ctx => {
     const { email, password } = ctx.request.body;
       
-        connection.query("SELECT * FROM user WHERE email='" + email + "'" ,
-                function (error, results, fields) {
-                if (error){ 
-                    console.log(error);
+    selectUser(email)
+    .then((data)=>{
+        if(data.length === 1) {
+            hasher({password:password, salt:results[0].salt}, function(err, pass, salt, hash){
+                if(err){
+                    console.log(err);
+                    return;
                 }
-           
-                if(results.length === 1) {
-                    hasher({password:password, salt:results[0].salt}, function(err, pass, salt, hash){
-                        if(err){
-                            console.log(err);
-                            return;
-                        }
-                        
-                        if(hash === results[0].password){
-                            return console.log('login success');
-                          }
-                          return console.log('login failed');
-                    })
-                }else {
-                    console.log('User not exists');
-                }
-            });
+                
+                if(hash === results[0].password){
+                    return console.log('login success');
+                  }
+                  return console.log('login failed');
+            })
+        }else {
+            console.log('User not exists');
+        }
+    })
+    .catch((error)=>{
+        console.log("error ocurred", error);
+    })
     
-  };
+};
 
 
   
