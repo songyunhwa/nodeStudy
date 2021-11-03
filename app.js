@@ -11,7 +11,7 @@ const api = require('./api');
 router.use('/api', api.routes()); 
 
 
-app.use(bodyParser());
+app.use(bodyParser()); // api 값을 parser
 app.use(router.routes()).use(router.allowedMethods());
 
 
