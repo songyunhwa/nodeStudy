@@ -15,6 +15,7 @@ exports.signUp = ctx => {
     const { name, email, password } = ctx.request.body;
 
     hasher({password : password, salt:salt} ,(error,pass,salt,hash)=>{
+ 
     if(error){
         ctx.body= error ;
     }
@@ -61,19 +62,25 @@ insertUser = (name,email,hash,salt) => {
 });
 }
 
-exports.login = (ctx) => { 
+
+Hashing = (password , salt ) => {
+    return new Promise((resolve, reject)=> {
+    hasher({password:password, salt:salt}, function(err, pass, salt, hash){
+        resolve(hash);
+    })
+});
+};
+
+exports.login = async (ctx) => { 
+
     const { email, password } = ctx.request.body;
       
-    var promise = selectUser(email);
-    promise.then(function (data){
+    var data = await selectUser(email);
+
         if(data.email.length > 0) {
-            
-            hasher({password:password, salt:data.salt}, async function(err, pass, salt, hash){
-                if(err){
-                    //ctx.body =  err;
-                }
-                
-                else if(hash === data.password){
+            const passwd = await Hashing(password, data.salt);
+    
+                 if(passwd === data.password){
                     console.log('login success');
                     try{
                     // jwt 생성 // 비동기
@@ -90,23 +97,19 @@ exports.login = (ctx) => {
                   else {
                       ctx.body= 'login failed' ;
                   }
-            })
+        
         }
         if(data === undefined){
             ctx.body = 'User not exists';
         }
-    })
-    .catch(function(error){
-        ctx.body = error;
-    })
-    
-};
+    };
 
 exports.authCheck = ctx => {
-    const token  =ctx.request.cookies.loginToken;
+    const token  =ctx.cookies.get('loginToken');
     if( token !== undefined) {
         const decode = jwt.verify(token);
         ctx.body= decode;
+        console.log(decode);
     }
 }
 
