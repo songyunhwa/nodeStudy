@@ -1,8 +1,8 @@
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : 'localhost',    // 호스트 주소
-  user     : 'root',           // mysql user
-  password : 'password1234!',       // mysql password
+  user     : 'test',           // mysql user
+  password : 'test',       // mysql password
   database : 'node_app'         // mysql 데이터베이스
 });
 connection.connect();
@@ -76,7 +76,6 @@ exports.login = async (ctx) => {
     const { email, password } = ctx.request.body;
       
     var data = await selectUser(email);
-
         if(data.email.length > 0) {
             const passwd = await Hashing(password, data.salt);
     

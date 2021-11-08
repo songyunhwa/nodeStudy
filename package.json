@@ -25,6 +25,7 @@
     "koa-router": "^10.1.1",
     "mysql": "^2.18.1",
     "pbkdf2-password": "^1.2.1",
-    "rand-token": "^1.0.1"
+    "rand-token": "^1.0.1",
+    "socket.io": "^4.3.2"
   }
 }

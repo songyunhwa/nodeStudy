@@ -10,7 +10,8 @@ const router = new Router();
 const api = require('./api');
 router.use('/api', api.routes()); 
 
-
+const middleWare = require('./module/middleWare');
+app.use(middleWare.jwtMiddle);
 app.use(bodyParser()); // api 값을 parser
 app.use(router.routes()).use(router.allowedMethods());
 
