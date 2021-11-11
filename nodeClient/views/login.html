@@ -1,0 +1,41 @@
+<html>
+<body>
+<div>
+    <form id="form">
+        <input id="email" type="email" name="email" />
+        <input id="password" type="password" name="password" />
+        <input type="button" title="전체보기" name="tot" onclick="login()" value="로그인"></input>
+
+    </form>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+
+<script>
+function login() {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    const form = {
+        'email' : email,
+        'password' : password
+    };
+    console.log("login form => " + form);
+
+
+        axios
+        .post('http://localhost:4041/api/user/login', form,
+        {
+            'Headers': 'Access-Control-Allow-Origin',
+        })
+    .then(res => {
+    console.log(`statusCode: ${res.status}`)
+    console.log(res)
+    })
+    .catch(error => {
+    console.error(error)
+    })
+
+    }
+</script>
+</body>

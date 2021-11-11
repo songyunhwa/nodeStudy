@@ -1,10 +1,14 @@
 const Koa = require('koa');
 const app = new Koa();
+const Router = require('koa-router');
+const router = new Router();
+const api = require('./api');
+const bodyParser =require('koa-bodyparser');
 
-app.use(ctx => {
-    ctx.body = 'Hello Koa';
-});
+router.use('/api', api.routes()); 
 
+app.use(bodyParser()); // api 값을 parser
+app.use(router.routes()).use(router.allowedMethods());
 
 
 const io = require("socket.io-client");

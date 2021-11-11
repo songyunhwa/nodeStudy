@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/songyunhwa/nodeApp#readme",
   "dependencies": {
+    "@koa/cors": "^3.1.0",
     "async": "^3.2.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",

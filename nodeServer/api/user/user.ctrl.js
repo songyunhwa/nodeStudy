@@ -1,8 +1,8 @@
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : 'localhost',    // 호스트 주소
-  user     : 'test',           // mysql user
-  password : 'test',       // mysql password
+  user     : 'root',           // mysql user
+  password : 'password1234!',       // mysql password
   database : 'node_app'         // mysql 데이터베이스
 });
 connection.connect();
@@ -72,10 +72,10 @@ Hashing = (password , salt ) => {
 };
 
 exports.login = async (ctx) => { 
-
     const { email, password } = ctx.request.body;
-      
+
     var data = await selectUser(email);
+      if(data !== undefined) {
         if(data.email.length > 0) {
             const passwd = await Hashing(password, data.salt);
     
@@ -91,15 +91,18 @@ exports.login = async (ctx) => {
                     }catch(error){
                         console.log("jwt create error because " + error);
                     }
-
+                    console.log('login success');
                   }
                   else {
                       ctx.body= 'login failed' ;
+                      console.log('login failed. password is wrong.');
                   }
         
         }
-        if(data === undefined){
+    }
+    else{
             ctx.body = 'User not exists';
+            console.log('User not exists');
         }
     };
 
