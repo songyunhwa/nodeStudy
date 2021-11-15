@@ -26,10 +26,16 @@ let corsOptions = {
 app.proxy = true; // true 일때 proxy 헤더들을 신뢰함
 app.use(cors());
 
-
-const io = require('socket.io');
-
 app.listen(port, function () {
     console.log('Example app listening on port : ' + port);
 });
 
+
+//socket 
+var io = require('socket.io')(app);
+io.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+      console.log(data);
+    });
+  });

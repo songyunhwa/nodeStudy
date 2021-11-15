@@ -1,44 +1,37 @@
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',    // 호스트 주소
-  user     : 'root',           // mysql user
-  password : 'password1234!',       // mysql password
-  database : 'node_app'         // mysql 데이터베이스
-});
-connection.connect();
+const mysql = require('../../mysql');
 const pbkdf2Password = require("pbkdf2-password");
 const hasher = pbkdf2Password();
 const  salt = '###DFDSFSDFSEE4rwersdfsdfR';
 const jwt = require("../../module/jwt");
 
-exports.signUp = ctx => {
+exports.signUp =  (ctx) => {
     const { name, email, password } = ctx.request.body;
 
-    hasher({password : password, salt:salt} ,(error,pass,salt,hash)=>{
+    hasher({password : password, salt:salt} ,async function(error,pass,salt,hash){
  
     if(error){
         ctx.body= error ;
     }
       
-    var promise = selectUser(email)
-    promise.then(function(data){
-        if(data === undefined){
+    var data = await selectUser(email)
+    if(data === undefined){
             insert_promise = insertUser(name,email,hash,salt);
             insert_promise.catch(function(error){
                 ctx.body = 'insert user error because ' + error;
+                console.log('insert user error because ' + error);
             })
-        }else {
+    }else {
             ctx.body= 'User already exists' ;
-        }
-    })
-    .catch(function(error){
-        ctx.body=  error;
-    })
+            console.log('User already exists');
+    }
+
 })
 }
 
 selectUser = (email) => {
     return new Promise( (resolve, reject)=> {
+        mysql.getConnection((error, connection)=>{ 
+            if(error) throw reject(error);
     connection.query("SELECT * FROM user WHERE email='" + email + "'" ,
     function (error, results, fields) {
     if (error){ 
@@ -48,10 +41,13 @@ selectUser = (email) => {
     resolve(results[0]);
     });
     });
+    });
 }
 
 insertUser = (name,email,hash,salt) => {
     return new Promise( (resolve, reject)=> {
+        mysql.getConnection((error, connection)=>{ 
+            if(error) reject(error);
     connection.query('INSERT INTO user (name, email, password, salt) VALUES(?,?,?,? ) ' , [name, email, hash, salt], function (error, results, fields) {
         if (error) {
             reject(error);
@@ -59,6 +55,7 @@ insertUser = (name,email,hash,salt) => {
 
         resolve();
     }); 
+});
 });
 }
 

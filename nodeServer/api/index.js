@@ -1,10 +1,11 @@
 const user =require('./user');
-const socket = require('./socket');
+const board = require('./board');
+
 const Router=require('koa-router');
 const api = new Router();
 
 
 api.use('/user', user.routes());
-api.use('/socket', socket.routes());
+api.use('/board',board.routes() );
 
 module.exports= api;
