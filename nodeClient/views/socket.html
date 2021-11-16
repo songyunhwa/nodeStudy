@@ -1,10 +1,66 @@
-<html>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  var socket = io.connect('http://localhost:4041');
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.io Test</title>
+
+  <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    #chatContent {
+      border: 1px solid #000;
+      width: 100%;
+      height: 200px;
+      margin-bottom: 10px;
+      overflow-y: auto;
+    }
+
+    #myChat {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="chatContent">
+
+  </div>
+  <input id="myChat" type="text">
+
+  <script>
+    var socket = io.connect('http://localhost:4042');
+
+    socket.on("connect", () => {
+    console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+    
+    socket.emit('join', 'room1' , 'user' + socket.id.substring(0, 2));
   });
-</script>
+
+
+    socket.on('message', function (data) {
+      $("#chatContent").append(` user` + socket.id.substring(0, 2) + `: ${data.data}<br>`);
+    });
+
+    socket.on("disconnect", (socket) => {
+    socket.emit('message', 'room1' , ` user` + socket.id.substring(0, 2) + `: "${$(this).val()}" 퇴장했습니다.<br>`);
+    });
+
+    $("#myChat").on("keyup", function () {
+      if (window.event.keyCode == 13) {
+        socket.emit('message', 'room1' , $(this).val());
+        $(this).val("");
+      }
+    });
+    
+
+  </script>
+</body>
+
 </html>

@@ -1,0 +1,39 @@
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>날짜</th>
+                <th>조회수</th>
+            </tr>
+        </thead>
+        <tbody>
+            <div id="myTable" ></div>
+        </tbody>
+    </table>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+
+<script>
+    var lists = [];
+    window.onload = function(){ getBoardList(); }
+    function getBoardList() {
+
+        axios
+        .get('http://localhost:4041/api/board/')
+        .then(res => {
+           res.data.forEach(list => {
+            lists.push(list);
+            $('#myTable').append('<tr><td>'+list.id + '</td><td>' + list.title + 
+                '</td><td>' + list.writerId + '</td><td>' + list.date + 
+                    '</td><td>' +  list.hit + '</td></tr>');
+           });
+           console.log(lists);
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
+</script>
