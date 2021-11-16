@@ -11,9 +11,21 @@ router.use('/api', api.routes());
 app.use(bodyParser()); // api 값을 parser
 app.use(router.routes()).use(router.allowedMethods());
 
-
-
-var server = require('http').Server(app);
-server.listen(3000, () => {
-    console.log('heurm server is listening to port 3000');
+var port = 3000;
+app.listen(port, function () {
+    console.log('Example app listening on port : ' + port);
 });
+
+//cors
+const cors = require('@koa/cors');
+const corsOptions = {
+  origin: "http://localhost:4041",
+  credentials: true
+}
+app.use(cors(corsOptions));
+
+/* socket
+const io = require("socket.io-client");
+const socket = io("http://localhost:4042");
+*/
+

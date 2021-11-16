@@ -2,8 +2,9 @@
 var mysql = require('../../mysql');
 
 exports.getBoardList = async (ctx) => {
+    ctx.set("Access-Control-Allow-Origin", "*");
     const data = await getBoardListDB();
-  
+    
     ctx.response.body=data;
     console.log(ctx.response.body);
 
@@ -28,65 +29,58 @@ getBoardListDB = () => {
 });
 }
 
-exports.saveBoard = (ctx, next) => {
+exports.saveBoard = async (ctx, next) => {
     const { title, content, writerId} = ctx.request.body;
-    try{
-        this.saveDB(title, content, writerId);
-    }catch(error){
-        console.log(error);
-    }
-
-    console.log("save dashboard success!");
+    var  result = await saveDB(title, content, writerId);
+    ctx.response.body = result;
 }
 
 saveDB = (title, content, writerId) => {
+    return new Promise((resolve, reject) => {
     mysql.getConnection((error, connection)=>{ 
-        if(error) throw error;
+        if(error) reject(error);
 
     connection.query('INSERT INTO board (title, content, writerId, date) VALUES(?,?,?,? ) ' , [title, content, writerId, new Date()], function (error, results, fields) {
-        if (error) throw error;
+        if (error) reject(error);
 
-        console.log(results);
+        resolve(results);
     }); 
+    });
     });
 };
 
-exports.updateBoard = (ctx, next) => {
+exports.updateBoard = async (ctx, next) => {
     const { id, title, content, writerId} = ctx.request.body;
-    try{
-        this.updateDB(id, title, content, writerId);
-    }catch(error){
-        console.log(error);
-    }
+    const result = await updateDB(id, title, content, writerId);
+    ctx.response.body = result;
 }
 
 updateDB = (id, title, content, writerId) => {
+    return new Promise((resolve, reject) => {
     mysql.getConnection((error, connection)=>{ 
-        if(error) throw error;
+        if(error) reject(error);
 
     connection.query('UPDATE board SET title= ?, content=? , writerId= ?,  date= ? WHERE id = ? ', [title, content, writerId, new Date(), id], function (error, results, fields) {
-        if (error) throw error;
+        if (error) reject(error);
 
-        console.log(results);
+        resolve(results);
     }); 
     });
+});
 };
 
 
 exports.deleteBoard = (ctx, next) => {
     const {id} = ctx.request.body;
     try{
-        this.deleteDB(id)
-        .then((date) => {
-            console.log("save dashboard success!");
-        })
-        
+        deleteDB(id);
+         ctx.response.body = "save dashboard success!";        
     }catch(error){
-        console.log(error);
+        ctx.response.body = error;
     }
 }
 
-deleteDB = () =>{
+deleteDB = (id) =>{
 
     mysql.getConnection((error, connection)=>{ 
         if(error) throw error;
