@@ -3,8 +3,9 @@ const boardCtrl = require('./ctrl');
 const board = new Router();
 
 board.get('/', boardCtrl.getBoardList);
-board.post('/update', boardCtrl.updateBoard);
-board.post('/save', boardCtrl.saveBoard);
-board.delete('/', boardCtrl.deleteBoard);
+board.get('/:id', boardCtrl.getBoard);
+board.post('/', boardCtrl.updateBoard);
+board.put('/:id', boardCtrl.saveBoard);
+board.delete('/:id', boardCtrl.deleteBoard);
 
 module.exports= board;

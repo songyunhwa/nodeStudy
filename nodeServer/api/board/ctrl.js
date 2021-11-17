@@ -1,6 +1,31 @@
 
 var mysql = require('../../mysql');
 
+exports.getBoard = async (ctx) => {
+    const { id } = ctx.params;
+
+    ctx.set("Access-Control-Allow-Origin", "*");
+    const data = await getBoardDB(id);
+    
+    ctx.response.body=data;
+    console.log(ctx.response.body);
+
+}
+
+getBoardDB = (id) => {
+    return new Promise((resolve, reject) => {
+    mysql.getConnection( (error, connection)=>{ 
+        if(error) reject(error);
+       
+     connection.query('SELECT * FROM board WHERE id = ?', [id] , function (error, results, fields) {
+        if (error) ctx.body = error;
+        
+        resolve(results[0]);
+      });
+    });
+});
+}
+
 exports.getBoardList = async (ctx) => {
     ctx.set("Access-Control-Allow-Origin", "*");
     const data = await getBoardListDB();

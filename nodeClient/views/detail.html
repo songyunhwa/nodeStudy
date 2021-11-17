@@ -7,26 +7,25 @@
 
 
 <script>
-    var lists = [];
     window.onload = function(){ getBoardList(); }
     function getBoardList() {
 
         axios
-        .get('http://localhost:4041/api/board/')
+        .get('http://localhost:4041/api/board/' + 2)
         .then(res => {
+            console.log(res);
             $('#myTable').append('<table><thead><tr><th>번호</th>' +
                     '<th>제목 </th>' +
                     '<th>작성자</th>' +
                     '<th>날짜</th>' +
                     '<th>조회수</th></tr></thead>');
-           res.data.forEach((list, i) => {
-            lists.push(list);
+            var list = res.data;
             $('#myTable').append(
-                '<tbody><tr><td>'+list.id + '</td><td><a href="/api/detail/' + list.id + '">' + list.title + 
-                '</a></td><td>' + list.writerId + '</td><td>' + list.date + 
+                '<tbody><tr><td>'+list.id + '</td><td>' + list.title + 
+                '</td><td>' + list.writerId + '</td><td>' + list.date + 
                     '</td><td>' +  list.hit + '</td></tr></tbody>' +
                     '</table>');
-           });
+       
            console.log(lists);
         })
         .catch(error => {

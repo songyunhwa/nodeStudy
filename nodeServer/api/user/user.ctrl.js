@@ -37,7 +37,7 @@ selectUser = (email) => {
     if (error){ 
         reject(error);
     }
-   
+
     resolve(results[0]);
     });
     });
@@ -69,40 +69,39 @@ Hashing = (password , salt ) => {
 };
 
 exports.login = async (ctx) => { 
+    ctx.set("Access-Control-Allow-Origin", "*");
     const { email, password } = ctx.request.body;
+    console.log(email);
+    var data = await selectUser(email, password);
+    if(data !== undefined) {
+          var result = await checkJwt(data, password);
+           ctx.cookies.set('loginToken', result, {maxAge:3000, httpOnly: true});
+          ctx.body = result;
+    }
+     else{
+            ctx.body = 'User not exists';
+    }
+}
 
-    var data = await selectUser(email);
-      if(data !== undefined) {
+checkJwt = (data , password) => {
+    return new Promise( async (resolve, reject) => {
         if(data.email.length > 0) {
-            const passwd = await Hashing(password, data.salt);
-    
-                 if(passwd === data.password){
-                    console.log('login success');
+            const passwd = await jwt.verify(data.password);
+                 if(password === passwd){
+                
                     try{
                     // jwt 생성 // 비동기
                     const jwtToken =  await jwt.sign(data);
-                    console.log("jwtToken", jwtToken);
-
+                    resolve(jwtToken);
                     //ctx.body = data.email;
-                    ctx.cookies.set('loginToken', jwtToken, {maxAge:3000, httpOnly: true});
                     }catch(error){
-                        console.log("jwt create error because " + error);
+                        reject("jwt create error because " + error);
                     }
-                    console.log('login success');
                   }
-                  else {
-                      ctx.body= 'login failed' ;
-                      console.log('login failed. password is wrong.');
-                  }
-        
-        }
-    }
-    else{
-            ctx.body = 'User not exists';
-            console.log('User not exists');
-        }
+                
     };
-
+})
+}
 exports.authCheck = ctx => {
     const token  =ctx.cookies.get('loginToken');
     if( token !== undefined) {

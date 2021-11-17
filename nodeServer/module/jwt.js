@@ -24,6 +24,7 @@ module.exports = {
         try {
             // verify를 통해 값 decode!
             decoded = jwt.verify(token, secretKey);
+
         } catch (err) {
             if (err.message === 'jwt expired') {
                 return 'expired token';
