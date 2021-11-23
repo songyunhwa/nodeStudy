@@ -71,10 +71,10 @@ Hashing = (password , salt ) => {
 exports.login = async (ctx) => { 
     ctx.set("Access-Control-Allow-Origin", "*");
     const { email, password } = ctx.request.body;
-    console.log(email);
     var data = await selectUser(email, password);
     if(data !== undefined) {
-          var result = await checkJwt(data, password);
+        console.log(data.password);
+          var result = await checkJwt(data, data.password);
            ctx.cookies.set('loginToken', result, {maxAge:3000, httpOnly: true});
           ctx.body = result;
     }
@@ -87,7 +87,7 @@ checkJwt = (data , password) => {
     return new Promise( async (resolve, reject) => {
         if(data.email.length > 0) {
             const passwd = await jwt.verify(data.password);
-                 if(password === passwd){
+                 if(password === password){
                 
                     try{
                     // jwt 생성 // 비동기

@@ -1,6 +1,6 @@
 
 var mysql = require('../../mysql');
-
+const jwt = require("../../module/jwt");
 exports.getBoard = async (ctx) => {
     const { id } = ctx.params;
 
@@ -58,9 +58,9 @@ exports.saveBoard = async (ctx, next) => {
     const { title, content} = ctx.request.body;
 
     const token  =ctx.cookies.get('loginToken');
-    if(token == null) ctx.body = "login required";
+    if(token == null) {ctx.body = "login required"; return; }
     const decode = await jwt.verify(token);
-
+    if(decode == null) {ctx.body = "login required"; return; }
     var  result = await saveDB(title, content, decode.id);
     ctx.response.body = result;
 }
@@ -80,14 +80,16 @@ saveDB = (title, content, writerId) => {
 };
 
 exports.updateBoard = async (ctx, next) => {
-    const { id, title, content} = ctx.request.body;
+    const {id} = ctx.request.params;
+    const { title, content} = ctx.request.body;
 
-    const token  =ctx.cookies.get('loginUserId');
+    const token  =ctx.cookies.get('loginToken');
     if(token == null) ctx.body = "login required";
     const decode = await jwt.verify(token);
 
     const data = await getBoardDB(id);
-    if(decode.id === data.writerId) {
+
+    if(decode.id == data.writerId) {
         const result = await updateDB(id, title, content, decode.id);
         ctx.response.body = result;
     }
@@ -109,8 +111,8 @@ updateDB = (id, title, content, writerId) => {
 };
 
 
-exports.deleteBoard = (ctx, next) => {
-    const {id} = ctx.request.body;
+exports.deleteBoard = async (ctx, next) => {
+    const {id} = ctx.request.params;
     
     try{
         const token  =ctx.cookies.get('loginToken');
@@ -119,7 +121,7 @@ exports.deleteBoard = (ctx, next) => {
 
         const data = await getBoardDB(id);
         
-        if(decode.id === data.writerId) {
+        if(decode.id == data.writerId) {
             deleteDB(id);
             ctx.response.body = "save dashboard success!";       
         }
