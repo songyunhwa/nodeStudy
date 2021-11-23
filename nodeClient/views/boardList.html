@@ -1,14 +1,8 @@
-<html>
-<body>
 <div>
-    <form id="form">
-        <input id="title" name="title" />
-        <input id="content" name="content" />
-        <input type="button" title="전체보기" name="tot" onclick="login()" value="로그인"></input>
+    <div id="myTable" ></div>
 
-    </form>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
@@ -16,15 +10,7 @@
     var lists = [];
     window.onload = function(){ getBoardList(); }
     function getBoardList() {
-        var title = document.getElementById("title").value;
-        var content = document.getElementById("content").value;
 
-        
-        var params = {
-            "title" : title,
-            "content" : content,
-            "writerId" : 
-        }
         axios
         .get('http://localhost:4041/api/board/')
         .then(res => {
@@ -48,4 +34,3 @@
         })
     }
 </script>
-  writerId

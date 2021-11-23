@@ -55,8 +55,13 @@ getBoardListDB = () => {
 }
 
 exports.saveBoard = async (ctx, next) => {
-    const { title, content, writerId} = ctx.request.body;
-    var  result = await saveDB(title, content, writerId);
+    const { title, content} = ctx.request.body;
+
+    const token  =ctx.cookies.get('loginToken');
+    if(token == null) ctx.body = "login required";
+    const decode = await jwt.verify(token);
+
+    var  result = await saveDB(title, content, decode.id);
     ctx.response.body = result;
 }
 
@@ -75,9 +80,18 @@ saveDB = (title, content, writerId) => {
 };
 
 exports.updateBoard = async (ctx, next) => {
-    const { id, title, content, writerId} = ctx.request.body;
-    const result = await updateDB(id, title, content, writerId);
-    ctx.response.body = result;
+    const { id, title, content} = ctx.request.body;
+
+    const token  =ctx.cookies.get('loginUserId');
+    if(token == null) ctx.body = "login required";
+    const decode = await jwt.verify(token);
+
+    const data = await getBoardDB(id);
+    if(decode.id === data.writerId) {
+        const result = await updateDB(id, title, content, decode.id);
+        ctx.response.body = result;
+    }
+    else ctx.body = "writer id is not equal."
 }
 
 updateDB = (id, title, content, writerId) => {
@@ -97,9 +111,19 @@ updateDB = (id, title, content, writerId) => {
 
 exports.deleteBoard = (ctx, next) => {
     const {id} = ctx.request.body;
+    
     try{
-        deleteDB(id);
-         ctx.response.body = "save dashboard success!";        
+        const token  =ctx.cookies.get('loginToken');
+        if(token == null) ctx.body = "login required";
+        const decode = await jwt.verify(token);
+
+        const data = await getBoardDB(id);
+        
+        if(decode.id === data.writerId) {
+            deleteDB(id);
+            ctx.response.body = "save dashboard success!";       
+        }
+        
     }catch(error){
         ctx.response.body = error;
     }

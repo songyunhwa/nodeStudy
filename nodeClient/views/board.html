@@ -1,8 +1,16 @@
+<html>
+<body>
 <div>
-    <div id="myTable" ></div>
+    <form id="form">
+        <div>제목 </div>
+        <input id="title" name="title" />
+        <div>내용</div>
+        <input id="content" name="content" style="height: 200px; width:200px;"/>
+        <input type="button" title="전체보기" name="tot" onclick="login()" value="로그인"></input>
 
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
@@ -10,27 +18,22 @@
     var lists = [];
     window.onload = function(){ getBoardList(); }
     function getBoardList() {
+        var title = document.getElementById("title").value;
+        var content = document.getElementById("content").value;
 
+        
+        var params = {
+            "title" : title,
+            "content" : content,
+        }
         axios
-        .get('http://localhost:4041/api/board/')
+        .get('http://localhost:4041/api/board/' + req.params.id)
         .then(res => {
-            $('#myTable').append('<table><thead><tr><th>번호</th>' +
-                    '<th>제목 </th>' +
-                    '<th>작성자</th>' +
-                    '<th>날짜</th>' +
-                    '<th>조회수</th></tr></thead>');
-           res.data.forEach((list, i) => {
-            lists.push(list);
-            $('#myTable').append(
-                '<tbody><tr><td>'+list.id + '</td><td><a href="/api/detail/' + list.id + '">' + list.title + 
-                '</a></td><td>' + list.writerId + '</td><td>' + list.date + 
-                    '</td><td>' +  list.hit + '</td></tr></tbody>' +
-                    '</table>');
-           });
-           console.log(lists);
+           console.log(res);
         })
         .catch(error => {
             console.log(error)
         })
     }
 </script>
+  writerId

@@ -4,7 +4,7 @@ const board = new Router();
 
 board.get('/', boardCtrl.getBoardList);
 board.get('/:id', boardCtrl.getBoard);
-board.post('/', boardCtrl.updateBoard);
+board.post('/:id', boardCtrl.updateBoard);
 board.put('/:id', boardCtrl.saveBoard);
 board.delete('/:id', boardCtrl.deleteBoard);
 
